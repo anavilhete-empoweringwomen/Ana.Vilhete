@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Website Editor · Ana Vilhete</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..500&family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Editor: the site's own stone + ink palette, raspberry kept for the one action that matters (Publish). */
+:root{
+  --bg:#EDE9E3; --panel:#F7F5F1; --card:#FFFFFF; --sunk:#E4DFD7;
+  --ink:#1C1815; --muted:#6B625A; --faint:#958B81;
+  --line:rgba(28,24,21,.11); --line-2:rgba(28,24,21,.22);
+  --accent:#A8215A; --accent-ink:#FFFFFF; --accent-soft:rgba(168,33,90,.09);
+  --nude:#D8BCA6; --nude-soft:#F1E6DC; --nude-ink:#6E4A35;
+  --ok:#2F7D4F; --warn:#9A5B00; --err:#B42318;
+  --shadow:0 1px 2px rgba(28,24,21,.06),0 8px 24px -12px rgba(28,24,21,.18);
+  --f-display:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --f-ui:"Hanken Grotesk","Helvetica Neue",Arial,system-ui,sans-serif;
+  --f-mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:12px; --r-sm:8px;
+  --gl:max(16px, env(safe-area-inset-left, 0px)); --gr:max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#151210; --panel:#1C1916; --card:#24201C; --sunk:#100E0C;
+  --ink:#EFE9E1; --muted:#A99F94; --faint:#857B71;
+  --line:rgba(239,233,225,.10); --line-2:rgba(239,233,225,.2);
+  --accent:#D9558C; --accent-ink:#1A0B11; --accent-soft:rgba(217,85,140,.14);
+  --nude:#7A5A46; --nude-soft:#2E241D; --nude-ink:#E7C9B3;
+  --ok:#5FBF86; --warn:#E0A54A; --err:#F2726A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151210; --panel:#1C1916; --card:#24201C; --sunk:#100E0C;
+  --ink:#EFE9E1; --muted:#A99F94; --faint:#857B71;
+  --line:rgba(239,233,225,.10); --line-2:rgba(239,233,225,.2);
+  --accent:#D9558C; --accent-ink:#1A0B11; --accent-soft:rgba(217,85,140,.14);
+  --nude:#7A5A46; --nude-soft:#2E241D; --nude-ink:#E7C9B3;
+  --ok:#5FBF86; --warn:#E0A54A; --err:#F2726A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-ui);-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+.muted{color:var(--muted)}
+h1,h2,h3{margin:0;font-weight:400}
+
+/* buttons */
+.b{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line-2);background:var(--card);cursor:pointer;font-weight:500;font-size:14px;white-space:nowrap;text-decoration:none;transition:background .2s,border-color .2s,opacity .2s}
+.b:hover{border-color:var(--ink)}
+.b:disabled{opacity:.45;cursor:not-allowed;border-color:var(--line-2)}
+.b--primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.b--primary:hover{filter:brightness(1.07);border-color:var(--accent)}
+.b--ghost{background:transparent;border-color:transparent}
+.b--ghost:hover{background:var(--sunk);border-color:transparent}
+.b--danger{color:var(--err);border-color:color-mix(in srgb,var(--err) 40%,transparent);background:transparent}
+.b--danger:hover{background:color-mix(in srgb,var(--err) 10%,transparent);border-color:var(--err)}
+.b--sm{min-height:32px;padding:0 12px;font-size:13px}
+.icon-b{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:15px}
+.icon-b:hover{background:var(--sunk);color:var(--ink)}
+.icon-b:disabled{opacity:.3;cursor:default;background:transparent}
+
+/* ===== sign-in ===== */
+.signin{min-height:100%;display:grid;grid-template-columns:1fr}
+.si-art{position:relative;min-height:220px;background:#B4AC9F;overflow:hidden}
+.si-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.si-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,16,14,0) 40%,rgba(18,16,14,.65))}
+.si-art .cap{position:absolute;z-index:1;left:var(--gl);bottom:22px;color:#F3EEE7}
+.si-art .cap b{display:block;font:400 clamp(34px,5vw,56px)/1 var(--f-display);letter-spacing:-.02em}
+.si-art .cap span{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.si-form{padding:clamp(28px,6vw,72px) var(--gr) 40px var(--gl);display:grid;align-content:center;gap:22px;max-width:560px;width:100%;margin:0 auto}
+.si-form h1{font:400 clamp(32px,4vw,44px)/1.05 var(--f-display);letter-spacing:-.02em}
+.si-form h1 em{font-style:italic;color:var(--accent)}
+.si-form p{margin:0}
+@media(min-width:900px){.signin{grid-template-columns:5fr 6fr}.si-art{min-height:100vh}}
+.steps{margin:0;padding-left:20px;display:grid;gap:8px;color:var(--muted)}
+.steps b{color:var(--ink);font-weight:600}
+details.help{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:0 16px}
+details.help summary{cursor:pointer;padding:14px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+details.help summary::after{content:"+";font-weight:400;color:var(--muted)}
+details.help[open] summary::after{content:"–"}
+details.help>div{padding:0 0 16px;display:grid;gap:12px}
+.err-box{border:1px solid color-mix(in srgb,var(--err) 40%,transparent);background:color-mix(in srgb,var(--err) 8%,transparent);color:var(--ink);padding:12px 14px;border-radius:var(--r-sm);font-size:14px}
+.linkish{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:14px}
+.linkish:hover{color:var(--ink)}
+
+/* ===== fields ===== */
+.f{display:grid;gap:6px;min-width:0}
+.f>*,.main-in>*,.list>*,.card-b>*{min-width:0}
+.f>label,.f .lbl{font-weight:600;font-size:14px}
+.f .hint{font-size:13px;color:var(--muted);margin:0}
+.f .hint code{font-family:var(--f-mono);font-size:12px;background:var(--sunk);padding:1px 5px;border-radius:4px}
+.in{width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--card);transition:border-color .15s,box-shadow .15s}
+.in:hover{border-color:color-mix(in srgb,var(--ink) 40%,transparent)}
+.in:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea.in{resize:vertical;min-height:84px;line-height:1.5;overflow:hidden}
+select.in{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+.in.bad{border-color:var(--err)}
+.f .bad-msg{font-size:13px;color:var(--err)}
+.f .count{font-size:12px;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.f .count.over{color:var(--warn)}
+.rich-pv{font-family:var(--f-display);font-size:19px;line-height:1.25;color:var(--muted);padding:2px 0 0;overflow-wrap:anywhere}
+.rich-pv::before{content:"Shows as  ";font:500 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.rich-pv em{color:var(--ink)}
+.sw{display:flex;align-items:center;gap:12px;cursor:pointer;min-height:40px;user-select:none}
+.sw input{position:absolute;opacity:0;width:1px;height:1px}
+.sw .track{width:40px;height:24px;border-radius:99px;background:var(--line-2);position:relative;flex:none;transition:background .2s}
+.sw .track::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.sw input:checked+.track{background:var(--ok)}
+.sw input:checked+.track::after{transform:translateX(16px)}
+.sw input:focus-visible+.track{outline:2px solid var(--accent);outline-offset:2px}
+.sw .sw-t{font-weight:600;font-size:14px}
+.sw .sw-t small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+fieldset.grp{border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:0;display:grid;gap:18px;background:var(--panel)}
+fieldset.grp legend{padding:0 6px;font-weight:600}
+
+/* photo field */
+.ph-f{display:flex;align-items:center;gap:14px;padding:10px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--card)}
+.ph-f .th{width:56px;height:70px;border-radius:6px;background:var(--sunk);overflow:hidden;flex:none}
+.ph-f .th img{width:100%;height:100%;object-fit:cover;display:block}
+.ph-f .nm{flex:1;min-width:0;font-size:14px}
+.ph-f .nm small{display:block;color:var(--muted);font-size:12.5px}
+.ph-f .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+/* lists */
+.list{display:grid;gap:10px}
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow)}
+.card.is-hidden{opacity:.62}
+.card-h{display:flex;align-items:center;gap:4px;padding:4px 6px 4px 4px}
+.card-t{flex:1;min-width:0;display:flex;align-items:center;gap:10px;text-align:left;background:none;border:0;cursor:pointer;padding:10px 8px;border-radius:8px}
+.card-t:hover{background:var(--panel)}
+.card-t .no{font-family:var(--f-mono);font-size:11.5px;color:var(--faint);flex:none}
+.card-t .tt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.card-t .chev{margin-left:auto;color:var(--faint);transition:transform .2s;flex:none}
+.card[data-open] .card-t .chev{transform:rotate(90deg)}
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:99px;background:var(--sunk);color:var(--muted);flex:none}
+.card-b{padding:6px 16px 18px;display:grid;gap:18px;border-top:1px solid var(--line)}
+.card-acts{display:flex;align-items:center}
+.confirm-del{display:flex;align-items:center;gap:8px;padding:8px 12px;background:color-mix(in srgb,var(--err) 7%,transparent);border-top:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.confirm-del span{flex:1;min-width:160px}
+.add{justify-self:start}
+.list .list .card{box-shadow:none;background:var(--panel)}
+
+/* ===== app shell ===== */
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(0,1fr)}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px var(--gr) 10px var(--gl);padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--panel);position:relative;z-index:5}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0;text-decoration:none}
+.brand b{font:400 22px/1 var(--f-display)}
+.brand span{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.status.dirty i{background:var(--warn)}
+.status.demo i{background:var(--nude)}
+.status.busy i{background:var(--accent);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.top .sp{flex:1}
+.top .acts{display:flex;gap:8px;align-items:center}
+.acct{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 6px);min-width:240px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:6px;display:grid;z-index:20}
+.menu .mi{display:block;text-align:left;padding:10px 12px;border-radius:8px;background:none;border:0;cursor:pointer;font-size:14px;text-decoration:none}
+.menu .mi:hover{background:var(--panel)}
+.menu .meta{padding:8px 12px 10px;border-bottom:1px solid var(--line);margin-bottom:4px;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+
+.body{display:grid;grid-template-columns:minmax(0,1fr);min-height:0}
+.body>*{min-width:0}
+.side{border-right:1px solid var(--line);background:var(--panel);overflow:auto;padding:14px 10px 24px}
+.side h2{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:14px 12px 6px}
+.nav-i{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:0;background:none;cursor:pointer;font-size:14.5px;color:var(--ink)}
+.nav-i:hover{background:var(--sunk)}
+.nav-i[aria-current="true"]{background:var(--card);box-shadow:var(--shadow);font-weight:600}
+.nav-i .dot{width:7px;height:7px;border-radius:50%;background:var(--warn);margin-left:auto;flex:none}
+.nav-i .off{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-left:auto}
+.main{overflow:auto;min-width:0}
+.main-in{max-width:680px;margin:0 auto;padding:28px var(--gr) 120px var(--gl);display:grid;gap:22px}
+.sec-h{display:grid;gap:8px;padding-bottom:6px}
+.sec-h .mono{color:var(--accent)}
+.sec-h h1{font:400 clamp(30px,3.4vw,40px)/1.05 var(--f-display);letter-spacing:-.02em}
+.sec-h p{margin:0;color:var(--muted);max-width:60ch}
+.banner{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:12px 14px;border-radius:var(--r);background:var(--nude-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--nude) 60%,transparent);font-size:14px}
+.banner p{margin:0;flex:1;min-width:220px}
+.banner .bacts{display:flex;gap:8px;flex-wrap:wrap}
+.show-row{padding:4px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+
+.pv{display:none;min-width:0;background:var(--sunk);border-left:1px solid var(--line);grid-template-rows:auto 1fr;min-height:0}
+.pv-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+.pv-bar .mono{color:var(--muted);margin-right:auto}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:99px;padding:2px;background:var(--card)}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:99px;cursor:pointer;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.pv-stage{position:relative;overflow:hidden;min-height:0}
+.pv-frame{position:absolute;top:0;left:0;border:0;background:#ECE8E2;transform-origin:0 0}
+.pv-stage.phone .pv-frame{border-radius:28px;box-shadow:0 0 0 8px #1C1815,0 30px 60px -20px rgba(0,0,0,.5)}
+.pv-close{display:none}
+
+@media(min-width:760px){.body{grid-template-columns:230px minmax(0,1fr)}}
+@media(max-width:759px){
+  .pv-bar .mono{display:none}
+  .pv-bar .seg{margin-right:auto}
+  .side{border-right:0;border-bottom:1px solid var(--line);padding:8px var(--gr) 8px var(--gl);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+  .side::-webkit-scrollbar{display:none}
+  .side h2{display:none}
+  .nav-i{width:auto;white-space:nowrap;flex:none;padding:8px 12px}
+  .nav-i .dot{margin-left:4px}.nav-i .off{display:none}
+  .body{grid-template-rows:auto minmax(0,1fr)}
+  .brand span,.status .st-long{display:none}
+  .top .acts{width:100%;justify-content:flex-end;gap:6px}
+  .top .acts .b{flex:1 1 auto;padding:0 10px;min-width:0}
+  .top .acct{flex:none}
+}
+@media(min-width:1180px){
+  .body.with-pv{grid-template-columns:220px minmax(440px,600px) minmax(0,1fr)}
+  .body.with-pv .pv{display:grid}
+  .body.with-pv .main-in{padding-inline:28px}
+  .pv-open-b{display:none}
+}
+.pv.overlay{display:grid;position:fixed;inset:0;z-index:40;border:0}
+.pv.overlay .pv-close{display:inline-flex}
+
+/* photos library */
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.ph-card{border:1px solid var(--line);border-radius:var(--r);background:var(--card);overflow:hidden;display:grid;box-shadow:var(--shadow);min-width:0}
+.ph-card .im{aspect-ratio:4/5;background:var(--sunk);position:relative}
+.ph-card .im img{width:100%;height:100%;object-fit:cover;display:block}
+.ph-card .im .busy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;font-size:13px}
+.ph-card .bd{padding:12px;display:grid;gap:10px}
+.ph-card .use{font-size:12.5px;color:var(--muted)}
+.ph-card .use b{color:var(--ink);font-weight:600}
+.ph-card .row{display:flex;gap:6px;flex-wrap:wrap}
+.drop{border:1.5px dashed var(--line-2);border-radius:var(--r);display:grid;place-items:center;text-align:center;padding:24px;min-height:200px;cursor:pointer;color:var(--muted);background:var(--panel)}
+.drop:hover,.drop.over{border-color:var(--accent);color:var(--ink)}
+.drop b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
+
+/* history */
+.hist{display:grid;gap:8px}
+.h-item{display:flex;gap:14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--card);flex-wrap:wrap}
+.h-item .when{font-variant-numeric:tabular-nums;min-width:150px;font-weight:600;font-size:14px}
+.h-item .what{flex:1;min-width:180px;font-size:14px}
+.h-item .what small{display:block;color:var(--muted)}
+
+/* dialogs + toasts */
+dialog.dlg{border:0;padding:0;border-radius:16px;background:var(--card);color:var(--ink);width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 40px);box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
+dialog.dlg::backdrop{background:rgba(20,16,13,.5)}
+.dlg-in{padding:24px;display:grid;gap:16px}
+.dlg-in h2{font:400 28px/1.1 var(--f-display);letter-spacing:-.01em}
+.dlg-in p{margin:0}
+.dlg-acts{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding-top:4px}
+.dlg-list{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
+.warn-list{border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);background:color-mix(in srgb,var(--warn) 8%,transparent);border-radius:var(--r-sm);padding:10px 14px;font-size:14px}
+.warn-list ul{margin:6px 0 0;padding-left:18px}
+dialog.picker{width:min(860px,calc(100vw - 32px))}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-height:min(60vh,560px);overflow:auto;padding:2px}
+.pick{border:2px solid transparent;border-radius:10px;background:var(--panel);padding:0;cursor:pointer;overflow:hidden;text-align:left;display:grid}
+.pick img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.pick span{padding:6px 8px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pick[aria-pressed="true"]{border-color:var(--accent)}
+.pick.none,.pick.up{display:grid;place-items:center;aspect-ratio:4/5.6;color:var(--muted);font-size:13px;text-align:center;padding:10px;border:1.5px dashed var(--line-2)}
+.toasts{position:fixed;z-index:60;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;width:min(480px,calc(100vw - 32px))}
+.toast{background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;font-size:14px;box-shadow:0 12px 30px -10px rgba(0,0,0,.4);animation:tin .3s ease-out}
+.toast.err{background:var(--err);color:#fff}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+.loading{height:100%;display:grid;place-items:center;align-content:center;gap:14px;color:var(--muted)}
+.loading b{font:400 44px/1 var(--f-display);color:var(--ink)}
+.spin{width:22px;height:22px;border:2px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:sp 0.8s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="root"><div class="loading"><b>AV</b><span>Opening the editor…</span></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<dialog class="dlg" id="dlg"><div class="dlg-in" id="dlgIn"></div></dialog>
+<dialog class="dlg picker" id="picker"><div class="dlg-in" id="pickIn"></div></dialog>
+<input type="file" id="fileIn" accept="image/*" hidden>
+
+<script>
+/* =====================================================================
+   Website editor for anavilhete.com
+   Content lives in content.json in the GitHub repository. This page reads
+   it, lets Ana edit it with forms, and publishes it back with one commit
+   (content.json + index.html). Photos are uploaded to images/ on choose.
+   ===================================================================== */
+const CONFIG = {
+  owner: "anavilhete-empoweringwomen",   // GitHub account that holds the website
+  repo: "Ana.Vilhete",                    // repository name
+  branch: ""                              // blank = the repository's default branch
+};
+
+const ON_SITE = /\/admin(\/|\/index\.html)?$/.test(location.pathname);
+const SITE_BASE = ON_SITE ? "../" : "";
+const SITE_PAGE = ON_SITE ? "../index.html" : "site.html";
+const ICON = {
+  eye: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  eyeOff: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
+  up: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  down: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
+  trash: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
+};
+const ORIGIN = location.origin === "null" ? "*" : location.origin;
+const ITALIC = "Put *asterisks* around words to set them in italics.";
+
+/* ---------------- helpers ---------------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rich = s => esc(s).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+const plain = s => String(s ?? "").replace(/\*/g, "");
+const clone = o => JSON.parse(JSON.stringify(o));
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const getP = (o, p) => p.reduce((a, k) => (a == null ? undefined : a[k]), o);
+const setP = (o, p, v) => { let a = o; for (let i = 0; i < p.length - 1; i++) { if (a[p[i]] == null) a[p[i]] = typeof p[i + 1] === "number" ? [] : {}; a = a[p[i]]; } a[p[p.length - 1]] = v; };
+const keyOf = p => p.join(".");
+const store = {
+  get(k, session) { try { return JSON.parse((session ? sessionStorage : localStorage).getItem(k) || "null"); } catch (e) { return null; } },
+  set(k, v, session) { try { (session ? sessionStorage : localStorage).setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (e) {} }
+};
+const b64ToText = b64 => new TextDecoder().decode(Uint8Array.from(atob(String(b64).replace(/\s/g, "")), c => c.charCodeAt(0)));
+const bytesToB64 = bytes => { let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); };
+const fmtDate = d => new Date(d).toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+function h(tag, attrs = {}, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "class") el.className = v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  kids.flat().forEach(c => c != null && c !== false && el.append(c.nodeType ? c : document.createTextNode(c)));
+  return el;
+}
+function toast(msg, err) {
+  const t = h("div", { class: "toast" + (err ? " err" : "") }, msg);
+  $("#toasts").append(t);
+  setTimeout(() => t.remove(), err ? 7000 : 4200);
+}
+function ask({ title, text, ok = "OK", cancel = "Cancel", danger = false }) {
+  return new Promise(res => {
+    const d = $("#dlg"), inn = $("#dlgIn");
+    inn.innerHTML = "";
+    const done = v => { d.close(); res(v); };
+    inn.append(h("h2", {}, title), h("p", { html: text }),
+      h("div", { class: "dlg-acts" },
+        cancel ? h("button", { class: "b", onclick: () => done(false) }, cancel) : null,
+        h("button", { class: "b " + (danger ? "b--danger" : "b--primary"), onclick: () => done(true) }, ok)));
+    d.onclose = () => res(false);
+    d.showModal();
+  });
+}
+
+/* ---------------- state ---------------- */
+const S = {
+  mode: null,           // "live" | "demo"
+  token: "", owner: CONFIG.owner, repo: CONFIG.repo, branch: CONFIG.branch,
+  published: null, baseSha: null, draft: null,
+  section: "site", open: new Set(), pending: {}, device: "desktop",
+  restoredFrom: null, versionNote: null, lastPublished: null
+};
+const draftKey = () => `av-editor-draft:${S.owner}/${S.repo}`;
+
+/* ---------------- GitHub ---------------- */
+async function gh(path, opts = {}) {
+  const base = `https://api.github.com/repos/${S.owner}/${S.repo}`;
+  const res = await fetch(path ? `${base}/${path}` : base, {
+    method: opts.method || "GET",
+    cache: "no-store",
+    headers: Object.assign({ Authorization: `Bearer ${S.token}`, Accept: "application/vnd.github+json" }, opts.body ? { "Content-Type": "application/json" } : {}),
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  if (!res.ok) {
+    let m = ""; try { m = (await res.json()).message || ""; } catch (e) {}
+    const e = new Error(m || res.statusText); e.status = res.status; throw e;
+  }
+  return res.status === 204 ? null : res.json();
+}
+function explain(e) {
+  if (e && e.status === 401) return "This access key isn’t valid or has expired. Sign out, then sign in with a new key.";
+  if (e && e.status === 403) return "This access key isn’t allowed to save. In GitHub, give the key “Contents: Read and write” access to the website repository.";
+  if (e && e.status === 404) return "GitHub couldn’t find the website with this key. Check the key has access to the repository " + S.owner + "/" + S.repo + ".";
+  if (e && (e.status === 409 || e.status === 422)) return "The website changed on GitHub while you were saving. Try publishing again.";
+  if (e instanceof TypeError) return "Couldn’t reach GitHub. Check your internet connection and try again.";
+  return (e && e.message) || "Something went wrong.";
+}
+async function loadLive() {
+  const info = await gh("");
+  if (!S.branch) S.branch = info.default_branch || "main";
+  try {
+    const f = await gh(`contents/content.json?ref=${encodeURIComponent(S.branch)}`);
+    S.baseSha = f.sha; S.published = JSON.parse(b64ToText(f.content));
+  } catch (e) {
+    if (e.status !== 404) throw e;
+    const idx = await gh(`contents/index.html?ref=${encodeURIComponent(S.branch)}`);
+    const m = b64ToText(idx.content).match(/<script type="application\/json" id="site-content">([\s\S]*?)<\/script>/);
+    if (!m) { const er = new Error("The website on GitHub isn’t the editable version yet. Upload the new site files (index.html, content.json, images and admin) first."); throw er; }
+    S.published = JSON.parse(m[1]); S.baseSha = null;
+  }
+}
+async function loadDemo() {
+  const r = await fetch(SITE_BASE + "content.json", { cache: "no-store" });
+  if (!r.ok) throw new Error("Couldn’t load the website content.");
+  S.published = await r.json(); S.baseSha = null;
+}
+
+/* ---------------- publishing ---------------- */
+const safeJson = c => JSON.stringify(c).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+const attr = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
+function buildSeo(c) {
+  const s = c.site, url = s.url || "/";
+  const hero = (c.photos || []).find(p => p.id === c.hero.photo);
+  const img = hero ? url.replace(/\/+$/, "") + "/" + hero.src : "";
+  const t = attr(s.title || s.name), d = attr(s.description);
+  return [`<title>${t}</title>`, `<meta name="description" content="${d}">`, `<meta property="og:title" content="${t}">`,
+    `<meta property="og:description" content="${d}">`, `<meta property="og:type" content="profile">`, `<meta property="og:url" content="${attr(url)}">`]
+    .concat(img ? [`<meta property="og:image" content="${attr(img)}">`] : [])
+    .concat([`<meta name="twitter:card" content="summary_large_image">`, `<link rel="canonical" href="${attr(url)}">`]).join("\n");
+}
+function applyToHtml(html, c) {
+  const reSeo = /<!--SEO:START-->[\s\S]*?<!--SEO:END-->/;
+  const reData = /(<script type="application\/json" id="site-content">)[\s\S]*?(<\/script>)/;
+  if (!reSeo.test(html) || !reData.test(html)) throw new Error("The website’s index.html is missing the editor markers. Upload the new index.html from the setup files, then publish again.");
+  return html.replace(reSeo, () => `<!--SEO:START-->\n${buildSeo(c)}\n<!--SEO:END-->`)
+             .replace(reData, (m, a, b) => a + safeJson(c) + b);
+}
+function cleanContent(c) {
+  const walk = v => {
+    if (Array.isArray(v)) {
+      const isStr = v.every(x => typeof x === "string");
+      return isStr ? v.map(x => x.trim()).filter(Boolean) : v.map(walk);
+    }
+    if (v && typeof v === "object") { const o = {}; for (const k in v) o[k] = walk(v[k]); return o; }
+    return typeof v === "string" ? v.replace(/\s+$/, "") : v;
+  };
+  return walk(c);
+}
+async function publishLive(note, force) {
+  const content = cleanContent(S.draft);
+  const ref = await gh(`git/ref/heads/${encodeURIComponent(S.branch)}`);
+  const headSha = ref.object.sha;
+  const head = await gh(`git/commits/${headSha}`);
+  const tree = await gh(`git/trees/${head.tree.sha}`);
+  const cur = tree.tree.find(e => e.path === "content.json");
+  if (!force && cur && S.baseSha && cur.sha !== S.baseSha) return { conflict: true };
+  const idx = await gh(`contents/index.html?ref=${headSha}`);
+  const html = applyToHtml(b64ToText(idx.content), content);
+  const json = JSON.stringify(content, null, 2) + "\n";
+  const nt = await gh("git/trees", { method: "POST", body: { base_tree: head.tree.sha, tree: [
+    { path: "content.json", mode: "100644", type: "blob", content: json },
+    { path: "index.html", mode: "100644", type: "blob", content: html }] } });
+  const commit = await gh("git/commits", { method: "POST", body: { message: note || "Update website content", tree: nt.sha, parents: [headSha] } });
+  await gh(`git/refs/heads/${encodeURIComponent(S.branch)}`, { method: "PATCH", body: { sha: commit.sha } });
+  const ent = nt.tree.find(e => e.path === "content.json");
+  return { ok: true, sha: ent ? ent.sha : null, content };
+}
+
+/* ---------------- photos ---------------- */
+async function processImage(file) {
+  let src;
+  try { src = await createImageBitmap(file, { imageOrientation: "from-image" }); }
+  catch (e) { src = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("This file isn’t a photo the browser can read. Try a JPG or PNG.")); i.src = URL.createObjectURL(file); }); }
+  const w0 = src.width, h0 = src.height, max = 1800, k = Math.min(1, max / Math.max(w0, h0));
+  const w = Math.round(w0 * k), hgt = Math.round(h0 * k);
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = hgt;
+  const cx = cv.getContext("2d"); cx.imageSmoothingQuality = "high"; cx.drawImage(src, 0, 0, w, hgt);
+  let blob = await new Promise(r => cv.toBlob(r, "image/webp", 0.82));
+  let ext = "webp";
+  if (!blob || blob.type !== "image/webp") { blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.86)); ext = "jpg"; }
+  return { blob, w, h: hgt, ext };
+}
+const slug = s => String(s || "photo").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\.[a-z0-9]+$/, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "photo";
+const prettyName = s => { const b = String(s || "").replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ").trim(); return b ? b[0].toUpperCase() + b.slice(1) : "New photo"; };
+async function uploadPhoto(file) {
+  const img = await processImage(file);
+  const name = `${slug(file.name)}-${Date.now().toString(36)}.${img.ext}`;
+  const path = `images/${name}`;
+  if (S.mode === "live") {
+    const b64 = bytesToB64(new Uint8Array(await img.blob.arrayBuffer()));
+    await gh(`contents/${path}`, { method: "PUT", body: { message: `Add photo ${name}`, content: b64, branch: S.branch } });
+  }
+  S.pending[path] = URL.createObjectURL(img.blob);
+  return { src: path, w: img.w, h: img.h };
+}
+function thumb(p) {
+  if (!p) return "";
+  return S.pending[p.src] || SITE_BASE + p.src;
+}
+function rawUrl(src) { return `https://raw.githubusercontent.com/${S.owner}/${S.repo}/${S.branch || "main"}/${src}`; }
+function imgEl(p, extra = {}) {
+  const i = h("img", Object.assign({ src: thumb(p), alt: "", loading: "lazy" }, extra));
+  if (S.mode === "live") i.addEventListener("error", function once() { i.removeEventListener("error", once); i.src = rawUrl(p.src); });
+  return i;
+}
+function photoUses(id, c = S.draft) {
+  const out = [];
+  const walk = (v, path) => {
+    if (Array.isArray(v)) v.forEach((x, i) => walk(x, path.concat(i)));
+    else if (v && typeof v === "object") for (const k in v) { if (k === "photo" && v[k] === id) out.push(path); else walk(v[k], path.concat(k)); }
+  };
+  walk(c, []);
+  return out.map(p => {
+    const sec = SECTIONS.find(s => (s.roots || [s.id]).includes(p[0]));
+    const idx = p.find(x => typeof x === "number");
+    return (sec ? sec.title : p[0]) + (idx != null ? ` · item ${idx + 1}` : p[1] === "feature" ? " · featured quote" : "");
+  });
+}
+let pickResolve = null;
+function pickPhoto(current, allowNone) {
+  return new Promise(res => {
+    pickResolve = res;
+    const d = $("#picker"), inn = $("#pickIn");
+    const draw = () => {
+      inn.innerHTML = "";
+      const grid = h("div", { class: "pick-grid" });
+      grid.append(h("button", { class: "pick up", onclick: () => chooseFile(async f => { await addPhotos([f]); draw(); }) }, h("span", {}, "+ Upload a new photo")));
+      if (allowNone) grid.append(h("button", { class: "pick none", "aria-pressed": !current ? "true" : "false", onclick: () => { d.close(); res(""); } }, "No photo"));
+      (S.draft.photos || []).forEach(p => grid.append(h("button", { class: "pick", "aria-pressed": p.id === current ? "true" : "false", title: p.name, onclick: () => { d.close(); res(p.id); } }, imgEl(p), h("span", {}, p.name || p.id))));
+      inn.append(h("h2", {}, "Choose a photo"), grid, h("div", { class: "dlg-acts" }, h("button", { class: "b", onclick: () => { d.close(); res(null); } }, "Cancel")));
+    };
+    draw();
+    d.onclose = () => { if (pickResolve === res) res(null); };
+    d.showModal();
+  });
+}
+function chooseFile(cb, multiple) {
+  const fi = $("#fileIn");
+  fi.multiple = !!multiple; fi.value = "";
+  fi.onchange = () => { const files = [...fi.files]; if (files.length) cb(multiple ? files : files[0]); };
+  fi.click();
+}
+let uploading = 0;
+async function addPhotos(files) {
+  const added = [];
+  for (const f of files) {
+    uploading++; setStatus();
+    try {
+      const up = await uploadPhoto(f);
+      let base = slug(f.name), id = base, n = 2;
+      while (S.draft.photos.some(p => p.id === id)) id = `${base}-${n++}`;
+      const p = { id, name: prettyName(f.name), src: up.src, w: up.w, h: up.h, alt: "" };
+      S.draft.photos.push(p); added.push(p);
+      toast(S.mode === "live" ? `Uploaded “${p.name}”. Add a short description, then publish to use it on the site.` : `Added “${p.name}” (demo — not uploaded).`);
+    } catch (e) { toast(`Couldn’t add ${f.name}: ${explain(e)}`, true); }
+    uploading--; setStatus();
+  }
+  changed(true);
+  return added;
+}
+
+/* ---------------- schema: what can be edited ---------------- */
+const SECTIONS = [
+  { id: "site", roots: ["site", "social"], title: "Site details", anchor: "top", intro: "Your name, how the site appears in Google and in shared links, and your social profiles.", fields: [
+    { k: "site.name", t: "text", label: "Name", help: "Used in the logo, the footer and the signature." },
+    { k: "site.initials", t: "text", label: "Initials", help: "The small logo in the corner and on the loading screen." },
+    { k: "site.title", t: "text", label: "Page title", help: "Shown on the browser tab and as the headline in Google results." },
+    { k: "site.description", t: "area", label: "Description for Google and shared links", counter: 160, help: "Shown under the title in Google, and in previews when the link is shared on WhatsApp or LinkedIn. About 150 characters is ideal." },
+    { k: "site.locations", t: "text", label: "Locations line", help: "The small text in the bottom corner of the opening screen." },
+    { k: "social", t: "list", label: "Social links", noun: "link", title: i => i.label || "New link", add: () => ({ label: "", url: "" }), fields: [
+      { k: "label", t: "text", label: "Name shown", help: "For example: Instagram" }, { k: "url", t: "url", label: "Link" }] },
+    { k: "site.url", t: "url", label: "Website address", help: "Only change this if the website moves to a new domain." }
+  ] },
+  { id: "hero", title: "Opening screen", anchor: "top", intro: "The first screen visitors see: your name, your line and the large portrait.", fields: [
+    { k: "hero.roles", t: "lines", label: "Roles above your name", help: "One per line." },
+    { k: "hero.firstName", t: "text", label: "Name, first line" },
+    { k: "hero.lastName", t: "text", label: "Name, second line", help: "This line is set in italics on the site." },
+    { k: "hero.quote", t: "rich", label: "Your line", help: "Quotation marks are added for you. " + ITALIC },
+    { k: "hero.intro", t: "area", label: "Short introduction" },
+    { k: "hero.photo", t: "photo", label: "Large portrait", help: "A full-length photo on a plain background works best." },
+    { k: "hero.primaryCta", t: "text", label: "Main button", help: "Goes to the contact section. Also used in the top menu." },
+    { k: "hero.secondaryCta", t: "text", label: "Second button", help: "Goes to the press section." },
+    { k: "hero.marquee", t: "lines", label: "Scrolling words under the opening screen", help: "One per line. Every other word is drawn in outline." }
+  ] },
+  { id: "about", title: "About", anchor: "about", intro: "A short introduction to who you are, with key facts.", fields: [
+    { k: "about.show", t: "show" },
+    { k: "about.label", t: "text", label: "Small label", help: "The small text next to the section number." },
+    { k: "about.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "about.lede", t: "area", label: "Opening paragraph", help: "Shown larger, with a drop capital." },
+    { k: "about.body", t: "area", label: "More text", help: "Leave an empty line between paragraphs." },
+    { k: "about.facts", t: "list", label: "Key facts", noun: "fact", title: i => [i.value, i.label].filter(Boolean).join(" — ") || "New fact", add: () => ({ value: "", label: "" }), fields: [
+      { k: "value", t: "text", label: "Number or year", help: "Plain numbers (like 3 or 10.4M) count up when they appear." }, { k: "label", t: "text", label: "What it means" }] },
+    { k: "about.photo", t: "photo", label: "Photo", allowNone: true },
+    { k: "about.caption", t: "text", label: "Photo caption" },
+    { k: "about.button", t: "text", label: "Button", help: "Goes to the Story section." }
+  ] },
+  { id: "work", title: "What I do", anchor: "work", intro: "The areas of your work, one line each.", fields: [
+    { k: "work.show", t: "show" },
+    { k: "work.label", t: "text", label: "Small label" },
+    { k: "work.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "work.items", t: "list", label: "Areas", noun: "area", title: i => plain(i.title) || "New area", add: () => ({ title: "", role: "", text: "", photo: "" }), fields: [
+      { k: "title", t: "rich", label: "Word", help: "One strong word. " + ITALIC },
+      { k: "role", t: "text", label: "Small line" },
+      { k: "text", t: "area", label: "Description" },
+      { k: "photo", t: "photo", label: "Photo on hover", allowNone: true, help: "Follows the cursor when someone points at this line on a computer." }] }
+  ] },
+  { id: "ventures", title: "Ventures", anchor: "ventures", intro: "Your companies, each as a card with an optional case file that opens in a window.", fields: [
+    { k: "ventures.show", t: "show" },
+    { k: "ventures.label", t: "text", label: "Small label" },
+    { k: "ventures.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "ventures.items", t: "list", label: "Companies", noun: "company", title: i => plain(i.name) || "New company", add: () => ({ name: "", look: "dark", role: "", since: "", text: "", photo: "", figures: [], tags: [], caseIntro: "", caseFacts: [] }), fields: [
+      { k: "name", t: "rich", label: "Company name", help: ITALIC },
+      { k: "look", t: "select", label: "Card colour", options: [["dark", "Dark"], ["nude", "Nude"]] },
+      { k: "role", t: "text", label: "Your role" },
+      { k: "since", t: "text", label: "Date line", help: "For example: Since 2020" },
+      { k: "text", t: "area", label: "Description" },
+      { k: "photo", t: "photo", label: "Photo at the top of the card", allowNone: true },
+      { k: "figures", t: "list", label: "Figures", noun: "figure", title: i => [i.value, i.label].filter(Boolean).join(" — ") || "New figure", add: () => ({ value: "", label: "" }), fields: [
+        { k: "value", t: "text", label: "Number" }, { k: "label", t: "text", label: "What it means" }] },
+      { k: "tags", t: "lines", label: "Tags", help: "One per line. Shown as small rounded labels." },
+      { k: "caseIntro", t: "area", label: "Case file: introduction", help: "The window that opens from “Open the case”. Leave the case file empty to hide that button." },
+      { k: "caseFacts", t: "list", label: "Case file: details", noun: "detail", title: i => [i.label, i.value].filter(Boolean).join(": ") || "New detail", add: () => ({ label: "", value: "" }), fields: [
+        { k: "label", t: "text", label: "Label" }, { k: "value", t: "text", label: "Detail" }] }] }
+  ] },
+  { id: "portraits", title: "Portraits", anchor: "portraits", intro: "The photo gallery. Visitors can tap any photo to see it full screen.", fields: [
+    { k: "portraits.show", t: "show" },
+    { k: "portraits.label", t: "text", label: "Small label" },
+    { k: "portraits.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "portraits.note", t: "text", label: "Note beside the heading" },
+    { k: "portraits.items", t: "list", label: "Photos in the gallery", noun: "photo", title: i => i.label || i.caption || "New photo", add: () => ({ photo: "", label: "", caption: "" }), fields: [
+      { k: "photo", t: "photo", label: "Photo" }, { k: "label", t: "text", label: "Short label", help: "Shown on the photo when someone points at it." }, { k: "caption", t: "text", label: "Caption in the full-screen view" }] }
+  ] },
+  { id: "press", title: "Press", anchor: "press", intro: "The featured interview quote and your list of press, TV, radio and podcast appearances.", fields: [
+    { k: "press.show", t: "show" },
+    { k: "press.label", t: "text", label: "Small label" },
+    { k: "press.heading", t: "rich", label: "Heading", help: ITALIC },
+    { t: "group", label: "Featured quote", fields: [
+      { k: "press.feature.show", t: "toggle", label: "Show the featured quote" },
+      { k: "press.feature.quote", t: "rich", label: "Quote", help: "Quotation marks are added for you. " + ITALIC },
+      { k: "press.feature.kind", t: "text", label: "Type", help: "For example: Interview" },
+      { k: "press.feature.source", t: "text", label: "Publication" },
+      { k: "press.feature.url", t: "url", label: "Link to the article", help: "Optional." },
+      { k: "press.feature.photo", t: "photo", label: "Photo", allowNone: true }] },
+    { k: "press.items", t: "list", label: "Appearances", noun: "appearance", title: i => i.outlet || "New appearance", add: () => ({ outlet: "", format: "", url: "", cta: "Watch" }), fields: [
+      { k: "outlet", t: "text", label: "Outlet or programme" },
+      { k: "format", t: "text", label: "Type", help: "For example: Television · ITV, Podcast, Radio" },
+      { k: "url", t: "url", label: "Link", help: "Optional. Without a link the line is shown without a button." },
+      { k: "cta", t: "text", label: "Button word", help: "For example: Watch, Listen, Read. Only shown when there’s a link." }] }
+  ] },
+  { id: "story", title: "Story", anchor: "story", intro: "Your timeline, year by year, ending with what you’re doing now.", fields: [
+    { k: "story.show", t: "show" },
+    { k: "story.label", t: "text", label: "Small label" },
+    { k: "story.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "story.items", t: "list", label: "Milestones", noun: "milestone", hint: "Shown in this order, left to right.", title: i => [i.year, i.title].filter(Boolean).join(" · ") || "New milestone", add: () => ({ year: String(new Date().getFullYear()), to: "", title: "", text: "" }), fields: [
+      { k: "year", t: "text", label: "Year" }, { k: "to", t: "text", label: "Until (optional)", help: "For a period, like 2008 to 2011." },
+      { k: "title", t: "text", label: "Title" }, { k: "text", t: "area", label: "Description" }] },
+    { k: "story.nowTitle", t: "text", label: "Last card title" },
+    { k: "story.now", t: "lines", label: "What you’re doing now", help: "One per line. Leave empty to hide the last card." }
+  ] },
+  { id: "notes", title: "Notes & articles", anchor: "notes", intro: "Articles, interviews and essays. Cards with a link open that page.", fields: [
+    { k: "notes.show", t: "show" },
+    { k: "notes.label", t: "text", label: "Small label" },
+    { k: "notes.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "notes.items", t: "list", label: "Cards", noun: "card", title: i => plain(i.title) || "New card", add: () => ({ kind: "Article", source: "", title: "", text: "", url: "", featured: false, placeholder: false }), fields: [
+      { k: "title", t: "rich", label: "Title" }, { k: "text", t: "area", label: "Short text", help: "Optional." },
+      { k: "kind", t: "text", label: "Type", help: "For example: Interview, Essay" }, { k: "source", t: "text", label: "Publication" },
+      { k: "url", t: "url", label: "Link", help: "Optional." },
+      { k: "featured", t: "toggle", label: "Dark featured card" },
+      { k: "placeholder", t: "toggle", label: "Show as “Coming soon”" }] }
+  ] },
+  { id: "giving", title: "Giving back", anchor: "giving", intro: "The causes and roles you support.", fields: [
+    { k: "giving.show", t: "show" },
+    { k: "giving.label", t: "text", label: "Small label" },
+    { k: "giving.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "giving.lede", t: "area", label: "Introduction" },
+    { k: "giving.items", t: "list", label: "Causes and roles", noun: "cause", title: i => i.name || "New cause", add: () => ({ name: "", detail: "" }), fields: [
+      { k: "name", t: "text", label: "Name" }, { k: "detail", t: "text", label: "Detail" }] },
+    { k: "giving.photo", t: "photo", label: "Photo", allowNone: true }
+  ] },
+  { id: "contact", title: "Contact", anchor: "contact", intro: "How people get in touch. The form writes an email to your address; nothing is stored.", fields: [
+    { k: "contact.show", t: "show" },
+    { k: "contact.label", t: "text", label: "Small label" },
+    { k: "contact.heading", t: "rich", label: "Heading", help: ITALIC },
+    { k: "contact.lede", t: "area", label: "Introduction" },
+    { k: "contact.email", t: "email", label: "Email address" },
+    { k: "contact.topics", t: "lines", label: "Topics people can choose", help: "One per line. Used as the email subject." },
+    { k: "contact.photo", t: "photo", label: "Small round photo", allowNone: true },
+    { k: "contact.marquee", t: "lines", label: "Scrolling words above this section", help: "One per line. Leave empty to hide." }
+  ] },
+  { id: "footer", title: "Footer", anchor: "footer", intro: "The closing line at the bottom of every page.", fields: [
+    { k: "footer.tagline", t: "rich", label: "Closing line", help: ITALIC },
+    { k: "footer.photo", t: "photo", label: "Faded background photo", allowNone: true }
+  ] }
+];
+const SPECIAL = [
+  { id: "photos", roots: ["photos"], title: "Photo library" },
+  { id: "history", title: "History" }
+];
+
+/* ---------------- change tracking ---------------- */
+let pvTimer = 0, saveTimer = 0;
+function changed(structural) {
+  clearTimeout(pvTimer); pvTimer = setTimeout(sendPreview, 180);
+  clearTimeout(saveTimer); saveTimer = setTimeout(saveDraft, 500);
+  setStatus(); drawNav();
+  if (structural) drawMain();
+}
+function saveDraft() {
+  if (!S.draft) return;
+  if (same(S.draft, S.published)) store.del(draftKey());
+  else store.set(draftKey(), { content: S.draft, baseSha: S.baseSha, savedAt: Date.now() });
+}
+const isDirty = () => S.draft && S.published && !same(S.draft, S.published);
+function sectionDirty(sec) {
+  return (sec.roots || [sec.id]).some(r => !same(S.draft[r], S.published[r]));
+}
+function setStatus() {
+  const st = $("#status"); if (!st) return;
+  let cls = "", txt = "", long = "";
+  if (uploading) { cls = "busy"; txt = "Uploading photo…"; }
+  else if (S.mode === "demo") { cls = "demo"; txt = "Demo"; long = " · changes aren’t saved"; }
+  else if (isDirty()) { cls = "dirty"; txt = "Unpublished changes"; long = " · saved on this device"; }
+  else if (S.lastPublished && Date.now() - S.lastPublished < 180000) { txt = "Published"; long = " · live in about a minute"; }
+  else { txt = "Up to date"; }
+  st.className = "status " + cls;
+  st.innerHTML = `<i></i><span>${esc(txt)}<span class="st-long">${esc(long)}</span></span>`;
+  const pb = $("#publishBtn"); if (pb) pb.disabled = S.mode !== "live" || !isDirty() || uploading > 0;
+  const db = $("#discardBtn"); if (db) db.disabled = !isDirty();
+}
+
+/* ---------------- field rendering ---------------- */
+let uid = 0;
+function autoGrow(t) { t.style.height = "auto"; t.style.height = Math.max(84, t.scrollHeight + 2) + "px"; }
+function fieldEl(f, base) {
+  if (f.t === "group") {
+    const fs = h("fieldset", { class: "grp" }, h("legend", {}, f.label));
+    f.fields.forEach(x => fs.append(fieldEl(x, base)));
+    return fs;
+  }
+  const path = base.concat(f.k.split("."));
+  const id = "f" + (++uid);
+  const val = getP(S.draft, path);
+  const set = v => { setP(S.draft, path, v); changed(); };
+  const hint = f.help ? h("p", { class: "hint", id: id + "h" }, f.help) : null;
+  const wrap = h("div", { class: "f", "data-path": keyOf(path) });
+
+  if (f.t === "show") {
+    const cb = h("input", { type: "checkbox", id });
+    cb.checked = val !== false;
+    cb.addEventListener("change", () => { set(cb.checked); });
+    return h("div", { class: "show-row" }, h("label", { class: "sw", for: id }, cb, h("span", { class: "track" }), h("span", { class: "sw-t" }, "Show this section on the website", h("small", {}, "Turn off to hide it without losing the content."))));
+  }
+  if (f.t === "toggle") {
+    const cb = h("input", { type: "checkbox", id });
+    cb.checked = f.k.endsWith(".show") ? val !== false : !!val;
+    cb.addEventListener("change", () => set(cb.checked));
+    wrap.append(h("label", { class: "sw", for: id }, cb, h("span", { class: "track" }), h("span", { class: "sw-t" }, f.label)));
+    if (hint) wrap.append(hint);
+    return wrap;
+  }
+  if (f.t === "photo") {
+    const p = (S.draft.photos || []).find(x => x.id === val);
+    const box = h("div", { class: "ph-f" },
+      h("div", { class: "th" }, p ? imgEl(p) : null),
+      h("div", { class: "nm" }, p ? (p.name || p.id) : "No photo", h("small", {}, p ? (p.alt ? "" : "No description yet") : "")),
+      h("div", { class: "acts" },
+        h("button", { type: "button", class: "b b--sm", onclick: async () => { const r = await pickPhoto(val, f.allowNone); if (r === null) return; setP(S.draft, path, r); changed(true); } }, p ? "Change" : "Choose"),
+        f.allowNone && p ? h("button", { type: "button", class: "b b--sm b--ghost", onclick: () => { setP(S.draft, path, ""); changed(true); } }, "Remove") : null));
+    wrap.append(h("span", { class: "lbl" }, f.label), box);
+    if (hint) wrap.append(hint);
+    return wrap;
+  }
+  if (f.t === "list") return listEl(f, path);
+
+  wrap.append(h("label", { for: id }, f.label));
+  if (hint) wrap.append(hint);
+  let input;
+  if (f.t === "area" || f.t === "lines") {
+    input = h("textarea", { class: "in", id, rows: f.t === "lines" ? 4 : 3, "aria-describedby": hint ? id + "h" : null });
+    input.value = f.t === "lines" ? (Array.isArray(val) ? val.join("\n") : "") : (val ?? "");
+    input.addEventListener("input", () => { autoGrow(input); set(f.t === "lines" ? input.value.split("\n") : input.value); });
+    requestAnimationFrame(() => autoGrow(input));
+  } else if (f.t === "select") {
+    input = h("select", { class: "in", id }, f.options.map(([v, l]) => h("option", { value: v }, l)));
+    input.value = val || f.options[0][0];
+    input.addEventListener("change", () => set(input.value));
+  } else {
+    input = h("input", { class: "in", id, type: f.t === "email" ? "email" : f.t === "url" ? "url" : "text", "aria-describedby": hint ? id + "h" : null, autocomplete: "off", spellcheck: f.t === "url" || f.t === "email" ? "false" : "true" });
+    input.value = val ?? "";
+    input.addEventListener("input", () => set(input.value));
+  }
+  wrap.append(input);
+  if (f.t === "rich") {
+    const pv = h("div", { class: "rich-pv", html: rich(input.value) });
+    input.addEventListener("input", () => pv.innerHTML = rich(input.value));
+    wrap.append(pv);
+  }
+  if (f.counter) {
+    const cn = h("div", { class: "count" });
+    const upd = () => { const n = input.value.length; cn.textContent = `${n} / ${f.counter}`; cn.classList.toggle("over", n > f.counter); };
+    input.addEventListener("input", upd); upd(); wrap.append(cn);
+  }
+  if (f.t === "url" || f.t === "email") {
+    const msg = h("span", { class: "bad-msg", hidden: true });
+    const check = () => {
+      const v = input.value.trim(); let bad = "";
+      if (v && f.t === "url" && !/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(v)) bad = "Paste the full link, starting with https://";
+      if (v && f.t === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) bad = "That doesn’t look like an email address.";
+      input.classList.toggle("bad", !!bad); msg.hidden = !bad; msg.textContent = bad;
+    };
+    input.addEventListener("blur", check); input.addEventListener("input", () => { if (input.classList.contains("bad")) check(); });
+    check(); wrap.append(msg);
+  }
+  return wrap;
+}
+
+function listEl(f, path) {
+  if (!Array.isArray(getP(S.draft, path))) setP(S.draft, path, []);
+  const arr = getP(S.draft, path);
+  const wrap = h("div", { class: "f" }, h("span", { class: "lbl" }, f.label));
+  if (f.hint || f.help) wrap.append(h("p", { class: "hint" }, f.hint || f.help));
+  const list = h("div", { class: "list" });
+  arr.forEach((item, i) => {
+    const ip = path.concat(i), k = keyOf(ip), open = S.open.has(k);
+    const card = h("div", { class: "card" + (item.hidden ? " is-hidden" : ""), "data-key": k });
+    if (open) card.setAttribute("data-open", "");
+    const title = h("span", { class: "tt" }, f.title(item));
+    const tbtn = h("button", { type: "button", class: "card-t", "aria-expanded": open ? "true" : "false", onclick: () => { if (S.open.has(k)) S.open.delete(k); else S.open.add(k); drawMain(); } },
+      h("span", { class: "no" }, String(i + 1).padStart(2, "0")), title, item.hidden ? h("span", { class: "tag" }, "Hidden") : null, h("span", { class: "chev", "aria-hidden": "true" }, "›"));
+    const move = d => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]];
+      const wasI = S.open.has(k), wasJ = S.open.has(keyOf(path.concat(j))); S.open.delete(k); S.open.delete(keyOf(path.concat(j)));
+      if (wasI) S.open.add(keyOf(path.concat(j))); if (wasJ) S.open.add(k); changed(true);
+      requestAnimationFrame(() => { const el = $(`[data-key="${CSS.escape(keyOf(path.concat(j)))}"] .card-t`); if (el) el.focus(); }); };
+    const delRow = h("div", { class: "confirm-del", hidden: true },
+      h("span", {}, `Delete this ${f.noun}? This can’t be undone after you publish.`),
+      h("button", { type: "button", class: "b b--sm", onclick: () => delRow.hidden = true }, "Keep"),
+      h("button", { type: "button", class: "b b--sm b--danger", onclick: () => { arr.splice(i, 1); S.open.clear(); changed(true); toast(`Deleted. Use “Discard changes” at the top if that was a mistake.`); } }, "Delete"));
+    card.append(h("div", { class: "card-h" }, tbtn, h("div", { class: "card-acts" },
+      h("button", { type: "button", class: "icon-b", title: item.hidden ? "Show on the website" : "Hide from the website", "aria-label": item.hidden ? "Show on the website" : "Hide from the website", html: item.hidden ? ICON.eyeOff : ICON.eye, onclick: () => { item.hidden = !item.hidden; if (!item.hidden) delete item.hidden; changed(true); } }),
+      h("button", { type: "button", class: "icon-b", title: "Move up", "aria-label": "Move up", disabled: i === 0, html: ICON.up, onclick: () => move(-1) }),
+      h("button", { type: "button", class: "icon-b", title: "Move down", "aria-label": "Move down", disabled: i === arr.length - 1, html: ICON.down, onclick: () => move(1) }),
+      h("button", { type: "button", class: "icon-b", title: "Delete", "aria-label": "Delete", html: ICON.trash, onclick: () => { delRow.hidden = false; } }))), delRow);
+    if (open) {
+      const body = h("div", { class: "card-b" });
+      f.fields.forEach(x => body.append(fieldEl(x, ip)));
+      body.addEventListener("input", () => { title.textContent = f.title(item); });
+      card.append(body);
+    }
+    list.append(card);
+  });
+  wrap.append(list, h("button", { type: "button", class: "b add", onclick: () => {
+    arr.push(f.add()); const nk = keyOf(path.concat(arr.length - 1)); S.open.add(nk); changed(true);
+    requestAnimationFrame(() => { const c = $(`[data-key="${CSS.escape(nk)}"]`); if (c) { c.scrollIntoView({ block: "center", behavior: "smooth" }); const fi = c.querySelector(".card-b input, .card-b textarea"); if (fi) fi.focus({ preventScroll: true }); } });
+  } }, `+ Add ${f.noun}`));
+  return wrap;
+}
+
+/* ---------------- screens ---------------- */
+/* ---------------- email + password sign-in ----------------
+   The site has no server, so the password can't be checked anywhere private.
+   Instead the GitHub key is encrypted with the email + password (PBKDF2 → AES-GCM)
+   and only that locked copy is stored, in admin/login.json. The password itself
+   is never saved. A wrong email or password simply fails to unlock it. */
+const TE = new TextEncoder();
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function deriveKey(email, password, salt, iter) {
+  const base = await crypto.subtle.importKey("raw", TE.encode(email.trim().toLowerCase() + "\n" + password), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt, iterations: iter }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function sealLogin(email, password, secret) {
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)), iter = 600000;
+  const key = await deriveKey(email, password, salt, iter);
+  const data = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, TE.encode(JSON.stringify(secret))));
+  return { v: 1, kdf: "PBKDF2-SHA256", iter, salt: bytesToB64(salt), iv: bytesToB64(iv), data: bytesToB64(data), updated: new Date().toISOString() };
+}
+async function openLogin(rec, email, password) {
+  const key = await deriveKey(email, password, b64d(rec.salt), rec.iter || 600000);
+  const out = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64d(rec.iv) }, key, b64d(rec.data));
+  return JSON.parse(new TextDecoder().decode(out));
+}
+async function fetchLogin() {
+  if (!ON_SITE) return null;
+  try { const r = await fetch("login.json", { cache: "no-store" }); if (r.ok) { const j = await r.json(); if (j && j.data) return j; } } catch (e) {}
+  return null;
+}
+function rememberAuth(remember) {
+  const rec = { token: S.token, owner: S.owner, repo: S.repo, remember };
+  store.del("av-editor-auth");
+  if (remember) store.set("av-editor-auth", rec);
+  else { store.set("av-editor-auth", { owner: S.owner, repo: S.repo, remember: false }); store.set("av-editor-auth", rec, true); }
+}
+
+function drawSignin(err, login, view) {
+  const auth = store.get("av-editor-auth") || {};
+  const showPw = view ? view === "pw" : !!login || !ON_SITE;
+  const root = $("#root"); root.innerHTML = "";
+  const errBox = h("div", { class: "err-box", hidden: !err }, err || "");
+  const fail = m => { errBox.hidden = false; errBox.textContent = m; };
+  const rem = h("input", { type: "checkbox", id: "rem" }); rem.checked = auth.remember !== false;
+  const remRow = h("label", { class: "sw", for: "rem" }, rem, h("span", { class: "track" }), h("span", { class: "sw-t" }, "Keep me signed in on this device", h("small", {}, "Turn off on shared computers.")));
+  const busy = (b, on, label) => { b.disabled = on; b.innerHTML = on ? '<span class="spin"></span> Signing in…' : label; };
+  const demo = h("button", { type: "button", class: "linkish", style: "justify-self:start", onclick: async () => {
+    try { await loadDemo(); S.mode = "demo"; startEditor(); } catch (er) { fail(explain(er)); }
+  } }, "Look around without signing in (nothing is saved)");
+  let form;
+
+  if (showPw) {
+    const em = h("input", { class: "in", id: "em", type: "email", autocomplete: "username", spellcheck: "false", placeholder: "you@example.com" });
+    const pw = h("input", { class: "in", id: "pw", type: "password", autocomplete: "current-password" });
+    const eye = h("button", { type: "button", class: "linkish", style: "justify-self:end;font-size:13px", onclick: () => { pw.type = pw.type === "password" ? "text" : "password"; eye.textContent = pw.type === "password" ? "Show password" : "Hide password"; } }, "Show password");
+    const go = h("button", { class: "b b--primary", type: "submit", style: "justify-self:start;min-height:46px;padding:0 24px" }, "Sign in");
+    form = h("form", { class: "si-form", onsubmit: async e => {
+      e.preventDefault(); errBox.hidden = true;
+      if (!ON_SITE) return fail("Signing in works on the real website at anavilhete.com/admin. This copy is for looking around: use the link below.");
+      if (!em.value.trim() || !pw.value) return fail("Enter your email and password.");
+      busy(go, true);
+      let sec;
+      try { sec = await openLogin(login, em.value, pw.value); }
+      catch (er) { busy(go, false, "Sign in"); pw.select(); return fail("That email and password don’t match. Check for typing mistakes and capital letters."); }
+      S.token = sec.token; S.owner = sec.owner || CONFIG.owner; S.repo = sec.repo || CONFIG.repo; S.branch = CONFIG.branch;
+      try { await loadLive(); rememberAuth(rem.checked); S.mode = "live"; startEditor(); }
+      catch (er) {
+        busy(go, false, "Sign in");
+        fail(er.status === 401 ? "Your password is right, but the GitHub key behind it has expired. Sign in once with a new GitHub access key (link below), then set up the email and password again from the Account menu." : explain(er));
+      }
+    } },
+      h("div", { class: "mono", style: "color:var(--accent)" }, "Website editor"),
+      h("h1", { html: "Edit your <em>website</em>" }),
+      h("p", { class: "muted" }, "Change any text, list or photo, preview it, then publish. The live site updates about a minute later."),
+      errBox,
+      h("div", { class: "f" }, h("label", { for: "em" }, "Email"), em),
+      h("div", { class: "f" }, h("label", { for: "pw" }, "Password"), pw, eye),
+      remRow, go,
+      h("button", { type: "button", class: "linkish", style: "justify-self:start", onclick: () => drawSignin("", login, "key") }, "Sign in with a GitHub access key instead"),
+      demo);
+    setTimeout(() => em.focus(), 50);
+  } else {
+    const tok = h("input", { class: "in", id: "tok", type: "password", autocomplete: "off", spellcheck: "false", placeholder: "github_pat_…" });
+    const owner = h("input", { class: "in", id: "own", value: auth.owner || CONFIG.owner });
+    const repo = h("input", { class: "in", id: "rep", value: auth.repo || CONFIG.repo });
+    const go = h("button", { class: "b b--primary", type: "submit", style: "justify-self:start;min-height:46px;padding:0 24px" }, "Sign in");
+    form = h("form", { class: "si-form", onsubmit: async e => {
+      e.preventDefault(); errBox.hidden = true;
+      const t = tok.value.trim();
+      if (!ON_SITE) return fail("Signing in works on the real website at anavilhete.com/admin. This copy is for looking around: use the link below.");
+      if (!t) { tok.focus(); return fail("Paste your access key to sign in."); }
+      busy(go, true);
+      S.token = t; S.owner = owner.value.trim() || CONFIG.owner; S.repo = repo.value.trim() || CONFIG.repo; S.branch = CONFIG.branch;
+      try { await loadLive(); rememberAuth(rem.checked); S.mode = "live"; startEditor(); }
+      catch (er) { busy(go, false, "Sign in"); fail(explain(er)); }
+    } },
+      h("div", { class: "mono", style: "color:var(--accent)" }, "Website editor"),
+      h("h1", { html: "Sign in with a <em>GitHub key</em>" }),
+      h("p", { class: "muted" }, login ? "Use this if the email and password stop working, or to set them up again." : "Use the key once to set up an email and password for signing in (Account menu → Email and password sign-in)."),
+      errBox,
+      h("div", { class: "f" }, h("label", { for: "tok" }, "GitHub access key"), tok, h("p", { class: "hint" }, "A private key that lets this editor save to the website. Keep it like a password.")),
+      remRow, go,
+      h("details", { class: "help" }, h("summary", {}, "How do I get an access key?"), h("div", {},
+        h("ol", { class: "steps", html: `<li>Sign in to <b>github.com</b> as <b>${esc(CONFIG.owner)}</b>.</li>
+          <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener"><b>Settings → Developer settings → Fine-grained tokens → Generate new token</b></a>.</li>
+          <li>Name it <b>Website editor</b> and set an expiry (up to a year).</li>
+          <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick <b>${esc(CONFIG.repo)}</b>.</li>
+          <li>Under <b>Permissions → Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+          <li>Click <b>Generate token</b>, copy the key (it starts with <b>github_pat_</b>) and paste it above.</li>` }),
+        h("p", { class: "hint" }, "When the key expires, make a new one the same way, sign in with it, and set the email and password again."))),
+      h("details", { class: "help" }, h("summary", {}, "Website repository"), h("div", {},
+        h("div", { class: "f" }, h("label", { for: "own" }, "GitHub account"), owner),
+        h("div", { class: "f" }, h("label", { for: "rep" }, "Repository"), repo),
+        h("p", { class: "hint" }, "Only change these if the website moves to a different GitHub account or repository."))),
+      login || !ON_SITE ? h("button", { type: "button", class: "linkish", style: "justify-self:start", onclick: () => drawSignin("", login, "pw") }, "Back to email and password") : null,
+      demo);
+    setTimeout(() => tok.focus(), 50);
+  }
+  const art = h("div", { class: "si-art" }, h("img", { src: SITE_BASE + "images/hero.webp", alt: "" }), h("div", { class: "cap" }, h("span", {}, "anavilhete.com"), h("b", {}, "Ana Vilhete")));
+  root.append(h("div", { class: "signin" }, art, form));
+}
+
+async function openLoginSetup() {
+  const d = $("#dlg"), inn = $("#dlgIn"); inn.innerHTML = "";
+  if (S.mode !== "live") {
+    inn.append(h("h2", {}, "Email and password sign-in"), h("p", {}, "This is set up from the real editor at anavilhete.com/admin, after signing in once with the GitHub key."),
+      h("div", { class: "dlg-acts" }, h("button", { class: "b b--primary", onclick: () => d.close() }, "OK")));
+    d.onclose = null; d.showModal(); return;
+  }
+  let existing = null;
+  try { existing = await gh(`contents/admin/login.json?ref=${encodeURIComponent(S.branch)}`); } catch (e) { if (e.status !== 404) { toast(explain(e), true); return; } }
+  const em = h("input", { class: "in", id: "suEm", type: "email", autocomplete: "username", spellcheck: "false" });
+  const pw = h("input", { class: "in", id: "suPw", type: "password", autocomplete: "new-password" });
+  const pw2 = h("input", { class: "in", id: "suPw2", type: "password", autocomplete: "new-password" });
+  const msg = h("div", { class: "err-box", hidden: true });
+  const save = h("button", { class: "b b--primary" }, existing ? "Save new sign-in" : "Turn on");
+  const off = existing ? h("button", { class: "b b--danger" }, "Turn off") : null;
+  const cancel = h("button", { class: "b", onclick: () => d.close() }, "Cancel");
+  const bad = m => { msg.hidden = false; msg.textContent = m; };
+  save.onclick = async () => {
+    msg.hidden = true;
+    const e = em.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return bad("Enter a valid email address.");
+    if (pw.value.length < 10) return bad("Use a password of at least 10 characters.");
+    if (pw.value !== pw2.value) return bad("The two passwords don’t match.");
+    save.disabled = cancel.disabled = true; save.innerHTML = '<span class="spin"></span> Saving…';
+    try {
+      const rec = await sealLogin(e, pw.value, { token: S.token, owner: S.owner, repo: S.repo });
+      const body = { message: "Update editor sign-in", content: bytesToB64(TE.encode(JSON.stringify(rec, null, 2) + "\n")), branch: S.branch };
+      if (existing) body.sha = existing.sha;
+      await gh("contents/admin/login.json", { method: "PUT", body });
+      d.close(); toast("Email and password sign-in is on. It starts working in about a minute.");
+    } catch (er) { save.disabled = cancel.disabled = false; save.textContent = "Try again"; bad(explain(er)); }
+  };
+  if (off) off.onclick = async () => {
+    off.disabled = save.disabled = true;
+    try { await gh("contents/admin/login.json", { method: "DELETE", body: { message: "Turn off editor sign-in", sha: existing.sha, branch: S.branch } }); d.close(); toast("Email and password sign-in is off. Sign in with the GitHub key from now on."); }
+    catch (er) { off.disabled = save.disabled = false; bad(explain(er)); }
+  };
+  inn.append(...[
+    h("h2", {}, "Email and password sign-in"),
+    h("p", { class: "muted" }, "Sign in to the editor with an email and password instead of the GitHub key. The key is locked with this password and stored on the website; the password itself isn’t saved anywhere, so it can’t be looked up later."),
+    existing ? h("p", {}, h("b", {}, "Currently on."), " Enter the email and password again to change them.") : null,
+    msg,
+    h("div", { class: "f" }, h("label", { for: "suEm" }, "Email"), em),
+    h("div", { class: "f" }, h("label", { for: "suPw" }, "Password"), pw, h("p", { class: "hint" }, "At least 10 characters. A longer phrase that’s hard to guess is safest, because the locked key is public.")),
+    h("div", { class: "f" }, h("label", { for: "suPw2" }, "Repeat the password"), pw2),
+    h("div", { class: "dlg-acts" }, off, cancel, save)].filter(Boolean));
+  d.onclose = null; d.showModal(); em.focus();
+}
+
+function startEditor() {
+  S.draft = clone(S.published);
+  const saved = store.get(draftKey());
+  if (saved && saved.content && !same(saved.content, S.published)) {
+    S.draft = saved.content;
+    S.restoredFrom = { at: saved.savedAt, stale: S.mode === "live" && saved.baseSha !== S.baseSha };
+  }
+  S.draft.photos = S.draft.photos || [];
+  const root = $("#root"); root.innerHTML = "";
+  const acctBtn = h("button", { class: "b b--ghost", "aria-haspopup": "true", "aria-expanded": "false" }, S.mode === "demo" ? "Demo ▾" : "Account ▾");
+  const menu = h("div", { class: "menu", hidden: true });
+  acctBtn.onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; acctBtn.setAttribute("aria-expanded", String(!menu.hidden)); };
+  document.addEventListener("click", e => { if (!menu.hidden && !menu.contains(e.target)) { menu.hidden = true; acctBtn.setAttribute("aria-expanded", "false"); } });
+  menu.append(
+    h("div", { class: "meta" }, S.mode === "live" ? `Saving to ${S.owner}/${S.repo} (${S.branch})` : "Demo mode: edits stay in this window and can’t be published."),
+    h("a", { class: "mi", href: SITE_PAGE.replace("?preview=frame", ""), target: "_blank", rel: "noopener" }, "Open the live website ↗"),
+    h("button", { class: "mi", onclick: openFullPreview }, "Full-screen preview of my changes ↗"),
+    h("button", { class: "mi", onclick: () => { menu.hidden = true; go("history"); } }, "History and restore"),
+    h("button", { class: "mi", onclick: () => { menu.hidden = true; openLoginSetup(); } }, "Email and password sign-in"),
+    h("button", { class: "mi", onclick: async () => {
+      if (isDirty() && !(await ask({ title: "Sign out?", text: "Your unpublished changes stay saved on this device and come back when you sign in again.", ok: "Sign out" }))) return;
+      store.del("av-editor-auth"); location.reload();
+    } }, S.mode === "live" ? "Sign out" : "Leave demo"));
+  const top = h("header", { class: "top" },
+    h("a", { class: "brand", href: "#", onclick: e => { e.preventDefault(); go("site"); } }, h("b", {}, S.draft.site.initials || "AV"), h("span", {}, "Website editor")),
+    h("span", { class: "status", id: "status", role: "status" }),
+    h("span", { class: "sp" }),
+    h("div", { class: "acts" },
+      h("button", { class: "b b--ghost pv-open-b", onclick: () => { $("#pv").classList.add("overlay"); if (innerWidth < 700) setDevice("phone"); layoutPreview(); sendPreview(); } }, "Preview"),
+      h("button", { class: "b", id: "discardBtn", onclick: discard }, "Discard changes"),
+      h("button", { class: "b b--primary", id: "publishBtn", onclick: openPublish }, "Publish"),
+      h("div", { class: "acct" }, acctBtn, menu)));
+  const body = h("div", { class: "body with-pv", id: "shell" },
+    h("nav", { class: "side", id: "side", "aria-label": "Sections" }),
+    h("main", { class: "main", id: "main" }, h("div", { class: "main-in", id: "mainIn" })),
+    previewEl());
+  root.append(h("div", { class: "app" }, top, body));
+  if (innerWidth < 640) { $("#discardBtn").textContent = "Discard"; acctBtn.textContent = "More ▾"; }
+  drawNav(); drawMain(); setStatus();
+  addEventListener("keydown", e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); if (!$("#publishBtn").disabled) openPublish(); } });
+}
+
+function drawNav() {
+  const side = $("#side"); if (!side) return;
+  side.innerHTML = "";
+  side.append(h("h2", {}, "Page sections"));
+  SECTIONS.forEach(s => {
+    const off = s.fields.some(f => f.t === "show") && S.draft[s.id] && S.draft[s.id].show === false;
+    side.append(h("button", { class: "nav-i", "aria-current": S.section === s.id ? "true" : "false", onclick: () => go(s.id) },
+      s.title, off ? h("span", { class: "off" }, "Hidden") : null, sectionDirty(s) ? h("span", { class: "dot", title: "Unpublished changes" }) : null));
+  });
+  side.append(h("h2", {}, "Library"));
+  SPECIAL.forEach(s => side.append(h("button", { class: "nav-i", "aria-current": S.section === s.id ? "true" : "false", onclick: () => go(s.id) },
+    s.title, s.roots && sectionDirty(s) ? h("span", { class: "dot", title: "Unpublished changes" }) : null)));
+}
+function go(id) {
+  S.section = id; S.open.clear(); drawNav(); drawMain();
+  $("#main").scrollTop = 0;
+  const sec = SECTIONS.find(s => s.id === id);
+  if (sec) postToPreview({ type: "av-jump", id: sec.anchor });
+  const cur = $(`#side .nav-i[aria-current="true"]`); if (cur && innerWidth < 760) cur.scrollIntoView({ inline: "center", block: "nearest" });
+}
+function banners() {
+  const out = [];
+  if (S.mode === "demo") out.push(h("div", { class: "banner" }, h("p", {}, "You’re in demo mode. Try anything — the preview updates as you type — but nothing is saved to the website.")));
+  if (S.restoredFrom) out.push(h("div", { class: "banner" },
+    h("p", {}, S.restoredFrom.stale
+      ? `These are your unpublished changes from ${fmtDate(S.restoredFrom.at)}. The website was published from somewhere else since then, so publishing these will replace that version.`
+      : `Welcome back. Your unpublished changes from ${fmtDate(S.restoredFrom.at)} are here.`),
+    h("div", { class: "bacts" }, h("button", { class: "b b--sm", onclick: () => { S.restoredFrom = null; drawMain(); } }, "Keep editing"), h("button", { class: "b b--sm b--ghost", onclick: discard }, "Discard them"))));
+  if (S.versionNote) out.push(h("div", { class: "banner" }, h("p", {}, `You’ve opened the version from ${S.versionNote}. Publish to put it back on the website, or discard to return to the current one.`)));
+  return out;
+}
+function drawMain() {
+  const m = $("#mainIn"); if (!m) return;
+  const keep = $("#main").scrollTop;
+  const active = document.activeElement && document.activeElement.id && m.contains(document.activeElement) ? null : null;
+  m.innerHTML = ""; uid = 0;
+  banners().forEach(b => m.append(b));
+  const sec = SECTIONS.find(s => s.id === S.section);
+  if (sec) {
+    m.append(h("div", { class: "sec-h" }, h("span", { class: "mono" }, "Edit section"), h("h1", {}, sec.title), h("p", {}, sec.intro)));
+    sec.fields.forEach(f => m.append(fieldEl(f, [])));
+  } else if (S.section === "photos") drawPhotos(m);
+  else if (S.section === "history") drawHistory(m);
+  $("#main").scrollTop = keep;
+}
+
+function drawPhotos(m) {
+  m.append(h("div", { class: "sec-h" }, h("span", { class: "mono" }, "Library"), h("h1", {}, "Photo library"),
+    h("p", {}, "Every photo the website can use. Upload new ones here, then choose them in any section. Photos are resized for the web automatically.")));
+  const grid = h("div", { class: "ph-grid" });
+  const drop = h("div", { class: "drop", tabindex: "0", role: "button", onclick: () => chooseFile(fs => addPhotos(fs), true), onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chooseFile(fs => addPhotos(fs), true); } } },
+    h("div", {}, h("b", {}, "+ Upload photos"), "Click, or drop photos here. JPG, PNG or HEIC from a phone all work."));
+  drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); const fs = [...e.dataTransfer.files].filter(f => f.type.startsWith("image/")); if (fs.length) addPhotos(fs); });
+  grid.append(drop);
+  S.draft.photos.forEach((p, i) => {
+    const uses = photoUses(p.id);
+    const name = h("input", { class: "in", value: p.name || "", "aria-label": "Photo name", oninput: e => { p.name = e.target.value; changed(); } });
+    const alt = h("textarea", { class: "in", rows: 2, style: "min-height:64px", "aria-label": "Description", placeholder: "Describe the photo, e.g. Ana in an ivory suit, arms folded", oninput: e => { p.alt = e.target.value; changed(); } });
+    alt.value = p.alt || "";
+    const card = h("div", { class: "ph-card" },
+      h("div", { class: "im" }, imgEl(p)),
+      h("div", { class: "bd" },
+        h("div", { class: "f" }, h("span", { class: "lbl" }, "Name"), name),
+        h("div", { class: "f" }, h("span", { class: "lbl" }, "Description"), alt, h("p", { class: "hint" }, "Read aloud to blind visitors and used by Google.")),
+        h("div", { class: "use", html: uses.length ? `Used in <b>${uses.map(esc).join("</b>, <b>")}</b>` : "Not used on the site yet" }),
+        h("div", { class: "row" },
+          h("button", { class: "b b--sm", onclick: () => chooseFile(async f => {
+            uploading++; setStatus();
+            try { const up = await uploadPhoto(f); Object.assign(p, { src: up.src, w: up.w, h: up.h }); toast("Photo replaced everywhere it’s used. Publish to show it on the site."); changed(true); }
+            catch (e) { toast(explain(e), true); }
+            uploading--; setStatus();
+          }) }, "Replace"),
+          h("button", { class: "b b--sm b--danger", disabled: uses.length > 0, title: uses.length ? "Choose a different photo in those sections first" : "Remove from the library", onclick: () => { S.draft.photos.splice(i, 1); changed(true); toast("Removed from the library."); } }, "Remove"))));
+    grid.append(card);
+  });
+  m.append(grid);
+}
+
+async function drawHistory(m) {
+  m.append(h("div", { class: "sec-h" }, h("span", { class: "mono" }, "Library"), h("h1", {}, "History"),
+    h("p", {}, "Every time the website is published, a copy is kept. Open an earlier version to check it in the preview, then publish it to restore it.")));
+  if (S.mode !== "live") { m.append(h("div", { class: "banner" }, h("p", {}, "History is available when you’re signed in."))); return; }
+  const list = h("div", { class: "hist" }, h("div", { class: "muted" }, h("span", { class: "spin" }), "  Loading versions…"));
+  m.append(list);
+  try {
+    const commits = await gh(`commits?path=content.json&sha=${encodeURIComponent(S.branch)}&per_page=30`);
+    list.innerHTML = "";
+    if (!commits.length) list.append(h("p", { class: "muted" }, "No versions yet. Your first publish will appear here."));
+    commits.forEach((c, i) => list.append(h("div", { class: "h-item" },
+      h("span", { class: "when" }, fmtDate(c.commit.author.date)),
+      h("span", { class: "what" }, c.commit.message.split("\n")[0], h("small", {}, (c.commit.author.name || "") + (i === 0 ? " · on the website now" : ""))),
+      i === 0 ? null : h("button", { class: "b b--sm", onclick: async e => {
+        e.target.disabled = true;
+        try {
+          const f = await gh(`contents/content.json?ref=${c.sha}`);
+          S.draft = JSON.parse(b64ToText(f.content)); S.draft.photos = S.draft.photos || [];
+          S.versionNote = fmtDate(c.commit.author.date); S.restoredFrom = null;
+          S.section = "site"; changed(true); toast("Earlier version opened. Check the preview, then publish to restore it.");
+        } catch (er) { toast(explain(er), true); e.target.disabled = false; }
+      } }, "Open this version"))));
+  } catch (e) { list.innerHTML = ""; list.append(h("div", { class: "err-box" }, explain(e))); }
+}
+
+/* ---------------- discard / publish ---------------- */
+async function discard() {
+  if (!isDirty()) return;
+  if (!(await ask({ title: "Discard all changes?", text: "Everything you’ve changed since the last publish will be lost. The website itself isn’t affected.", ok: "Discard changes", danger: true }))) return;
+  S.draft = clone(S.published); S.restoredFrom = null; S.versionNote = null; S.open.clear();
+  store.del(draftKey()); changed(true); toast("Changes discarded.");
+}
+function issues() {
+  const out = [];
+  const walk = (v, path) => {
+    if (Array.isArray(v)) v.forEach((x, i) => walk(x, path.concat(i)));
+    else if (v && typeof v === "object") for (const k in v) walk(v[k], path.concat(k));
+    else if (typeof v === "string" && v.trim()) {
+      const k = path[path.length - 1];
+      if ((k === "url") && !/^https?:\/\/\S+\.\S+$/i.test(v.trim())) out.push(`A link in ${secName(path)} doesn’t start with https://`);
+      if (k === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) out.push("The contact email address doesn’t look right.");
+    }
+  };
+  walk(S.draft, []);
+  S.draft.photos.forEach(p => { if (!p.alt && photoUses(p.id).length) out.push(`The photo “${p.name || p.id}” has no description.`); });
+  return [...new Set(out)];
+}
+const secName = path => { const s = SECTIONS.find(x => (x.roots || [x.id]).includes(path[0])); return s ? s.title : path[0]; };
+function openPublish() {
+  if (S.mode !== "live" || !isDirty()) return;
+  const d = $("#dlg"), inn = $("#dlgIn"); inn.innerHTML = "";
+  const changedSecs = SECTIONS.concat(SPECIAL.filter(s => s.roots)).filter(sectionDirty).map(s => s.title);
+  const note = h("input", { class: "in", id: "pubNote", placeholder: "For example: Added the BBC interview", maxlength: 120 });
+  const iss = issues();
+  const go = h("button", { class: "b b--primary" }, "Publish now");
+  const cancel = h("button", { class: "b", onclick: () => d.close() }, "Cancel");
+  const msg = h("div", { hidden: true });
+  inn.append(...[h("h2", {}, "Publish your changes?"),
+    h("p", { class: "muted" }, "The live website updates about a minute after you publish."),
+    changedSecs.length ? h("div", {}, h("span", { class: "lbl", style: "font-weight:600;font-size:14px" }, "Changed"), h("ul", { class: "dlg-list" }, changedSecs.map(s => h("li", {}, s)))) : null,
+    iss.length ? h("div", { class: "warn-list" }, h("b", {}, "Worth checking first (you can still publish):"), h("ul", {}, iss.slice(0, 6).map(x => h("li", {}, x)))) : null,
+    h("div", { class: "f" }, h("label", { for: "pubNote" }, "What did you change? (optional)"), note, h("p", { class: "hint" }, "Shown in History, so you can find this version later.")),
+    msg, h("div", { class: "dlg-acts" }, cancel, go)].filter(Boolean));
+  const run = async force => {
+    go.disabled = cancel.disabled = true; go.innerHTML = '<span class="spin"></span> Publishing…'; msg.hidden = true;
+    const st = $("#status"); st.className = "status busy"; st.innerHTML = "<i></i><span>Publishing…</span>";
+    try {
+      const r = await publishLive(note.value.trim() || "Update website content", force);
+      if (r.conflict) {
+        go.disabled = cancel.disabled = false; go.textContent = "Publish mine anyway"; msg.hidden = false; msg.className = "warn-list";
+        msg.textContent = "The website was published from another device or browser since you opened the editor. Publishing now replaces that version with yours. To keep both, cancel, copy your changes somewhere, then reload the editor.";
+        go.onclick = () => run(true); setStatus(); return;
+      }
+      S.published = clone(r.content); S.draft = clone(r.content); S.baseSha = r.sha;
+      S.restoredFrom = null; S.versionNote = null; S.lastPublished = Date.now();
+      store.del(draftKey()); d.close(); changed(true);
+      toast("Published. The website updates in about a minute — refresh it to see your changes.");
+      setTimeout(setStatus, 181000);
+    } catch (e) {
+      go.disabled = cancel.disabled = false; go.textContent = "Try again"; msg.hidden = false; msg.className = "err-box"; msg.textContent = explain(e); setStatus();
+    }
+  };
+  go.onclick = () => run(false);
+  d.onclose = null; d.showModal(); note.focus();
+}
+
+/* ---------------- live preview ---------------- */
+function previewEl() {
+  const frame = h("iframe", { class: "pv-frame", id: "pvFrame", title: "Preview of the website", src: SITE_PAGE + "?preview=frame" });
+  const stage = h("div", { class: "pv-stage", id: "pvStage" }, frame);
+  const seg = h("div", { class: "seg", role: "group", "aria-label": "Preview size" },
+    h("button", { "aria-pressed": "true", "data-dev": "desktop", onclick: () => setDevice("desktop") }, "Computer"),
+    h("button", { "aria-pressed": "false", "data-dev": "phone", onclick: () => setDevice("phone") }, "Phone"));
+  const el = h("section", { class: "pv", id: "pv", "aria-label": "Preview" },
+    h("div", { class: "pv-bar" }, h("span", { class: "mono" }, "Preview · motion paused"), seg,
+      h("button", { class: "b b--sm b--ghost", title: "Open a full-screen preview in a new tab", onclick: openFullPreview }, "↗"),
+      h("button", { class: "b b--sm pv-close", onclick: () => $("#pv").classList.remove("overlay") }, "Close")),
+    stage);
+  new ResizeObserver(layoutPreview).observe(stage);
+  return el;
+}
+function setDevice(dev) {
+  S.device = dev;
+  $$("#pv .seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.dev === dev)));
+  layoutPreview();
+}
+function layoutPreview() {
+  const st = $("#pvStage"), fr = $("#pvFrame"); if (!st || !fr) return;
+  const W = st.clientWidth, H = st.clientHeight; if (!W || !H) return;
+  const phone = S.device === "phone", compact = phone && W < 520;
+  st.classList.toggle("phone", phone && !compact);
+  const vw = phone ? (compact ? W : 390) : 1280;
+  const pad = phone && !compact ? 24 : 0;
+  const scale = Math.min(1, (W - pad * 2) / vw);
+  const fh = compact ? H : phone ? Math.min(844, (H - pad * 2) / scale) : H / scale;
+  const left = phone ? (W - vw * scale) / 2 : 0;
+  fr.style.width = vw + "px"; fr.style.height = fh + "px";
+  fr.style.transform = `translate(${left}px,${pad}px) scale(${scale})`;
+}
+function postToPreview(msg) {
+  const fr = $("#pvFrame"); if (!fr || !fr.contentWindow) return;
+  try { fr.contentWindow.postMessage(msg, ORIGIN); } catch (e) {}
+}
+function sendPreview(jump) {
+  if (!S.draft) return;
+  postToPreview({ type: "av-content", content: S.draft, images: S.pending, jump: jump || null, rawBase: S.mode === "live" ? rawUrl("") : "" });
+}
+function openFullPreview() {
+  store.set("av-preview-draft", S.draft); store.set("av-preview-images", S.pending);
+  const a = h("a", { href: SITE_PAGE + "?preview=draft", target: "_blank", rel: "noopener" }); document.body.append(a); a.click(); a.remove();
+}
+addEventListener("message", e => {
+  if (ORIGIN !== "*" && e.origin !== location.origin) return;
+  if (e.data && e.data.type === "av-ready") { const sec = SECTIONS.find(s => s.id === S.section); sendPreview(sec && sec.anchor !== "top" ? sec.anchor : null); }
+});
+
+/* ---------------- boot ---------------- */
+(async function boot() {
+  const auth = store.get("av-editor-auth", true) || store.get("av-editor-auth");
+  if (new URLSearchParams(location.search).has("demo")) {
+    try { await loadDemo(); S.mode = "demo"; return startEditor(); } catch (e) { return drawSignin(explain(e), await fetchLogin()); }
+  }
+  if (auth && auth.token) {
+    S.token = auth.token; S.owner = auth.owner || CONFIG.owner; S.repo = auth.repo || CONFIG.repo; S.branch = CONFIG.branch;
+    try { await loadLive(); S.mode = "live"; return startEditor(); }
+    catch (e) { store.del("av-editor-auth"); return drawSignin(e.status === 401 ? "You’ve been signed out because the GitHub key expired or was removed. Sign in again." : explain(e), await fetchLogin()); }
+  }
+  drawSignin("", await fetchLogin());
+})();
+</script>
+</body>
+</html>
