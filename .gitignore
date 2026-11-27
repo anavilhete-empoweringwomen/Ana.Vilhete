@@ -1,0 +1,4 @@
+# Private working files: never publish on GitHub Pages
+CLAUDE.md
+handoff/
+.claude/

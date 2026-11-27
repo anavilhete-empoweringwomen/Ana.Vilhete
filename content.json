@@ -2,8 +2,8 @@
   "site": {
     "name": "Ana Vilhete",
     "initials": "AV",
-    "title": "Ana Vilhete",
-    "description": "Ana Vilhete — solicitor, founder of Alium Consultancy, partner at Themis Crown Advocates, speaker and philanthropist. Her aim is to empower growth.",
+    "title": "Ana Vilhete — Solicitor, Founder of Alium Consultancy & Co-founder of Themis Crown Advocates",
+    "description": "Ana Vilhete is an Angolan-born, London-based solicitor and entrepreneur: founder and CEO of Alium Consultancy (tech, data and health staffing), co-founder of Themis Crown Advocates, speaker, mentor and ITV Good Morning Britain contributor.",
     "url": "https://anavilhete.com/",
     "locations": "London · Amsterdam · Delaware"
   },
@@ -17,8 +17,8 @@
       "url": "https://www.linkedin.com/in/ana-vilhete-emba-us-uk-921748103/"
     },
     {
-      "label": "X / Twitter",
-      "url": "https://twitter.com/AnaVilhete"
+      "label": "X",
+      "url": "https://x.com/AnaVilhete"
     }
   ],
   "photos": [
@@ -149,7 +149,7 @@
       {
         "title": "*Give*",
         "role": "Mentor · Governor · Volunteer",
-        "text": "Mentoring at Birmingham University, school governance, a homeless programme, and support for an orphanage in São Tomé and Príncipe.",
+        "text": "Mentoring at University of Birmingham, school governance, a homeless programme, and support for an orphanage in São Tomé and Príncipe.",
         "photo": "full"
       }
     ]
@@ -297,16 +297,52 @@
     },
     "items": [
       {
-        "outlet": "BBC Radio London",
-        "format": "Radio",
-        "url": "",
-        "cta": ""
+        "outlet": "Stylist",
+        "format": "Feature · AI at work · Jul 2026",
+        "url": "https://www.stylist.co.uk/life/careers/women-ai-workplace/1095798",
+        "cta": "Read"
       },
       {
-        "outlet": "BBC Sounds",
-        "format": "Podcast",
-        "url": "https://www.bbc.co.uk/sounds/play/p0h2yhnp",
-        "cta": "Listen"
+        "outlet": "Stylist",
+        "format": "Feature · Motherhood & fitness · 2026",
+        "url": "https://www.stylist.co.uk/fitness-health/workouts/motherhood-fitness-gap-tips/1083140",
+        "cta": "Read"
+      },
+      {
+        "outlet": "Scottish Daily Mail",
+        "format": "Print feature · May 2026",
+        "url": "https://www.pressreader.com/uk/scottish-daily-mail/20260514/282041923762751",
+        "cta": "Read"
+      },
+      {
+        "outlet": "Daily Mail",
+        "format": "Feature · Alpha mums",
+        "url": "https://newstral.com/en/article/en/1278578630/meet-the-alpha-mums-desperate-for-their-kids-to-succeed-no-matter-what-finance-lessons-for-their-eight-year-olds-vision-boards-gratitude-walks-and-angry-clashes-with-other-parents-who-get-in-their-way",
+        "cta": "Read"
+      },
+      {
+        "outlet": "Black Ballad",
+        "format": "Feature · Wellbeing · Apr 2026",
+        "url": "https://blackballad.co.uk/mental-health-wellness/why-high-functioning-black-women-still-feel-stuck-after-therapy-doing-the-work",
+        "cta": "Read"
+      },
+      {
+        "outlet": "Cosmetics Business",
+        "format": "Analysis · Feb 2026",
+        "url": "https://cosmeticsbusiness.com/analysis-are-we-witnessing-the-fall-of-celebrity-beauty",
+        "cta": "Read"
+      },
+      {
+        "outlet": "INvolve Empower",
+        "format": "Role model profile · 2026",
+        "url": "https://empower.involverolemodels.org/person/ana-vilhete/",
+        "cta": "View"
+      },
+      {
+        "outlet": "The Voice",
+        "format": "Video interview · Oct 2024",
+        "url": "https://www.voice-online.co.uk/post/video/section/interviews/one-business-deal-changed-her-life-but-its-been-a-journey-for-ana-vilhete/",
+        "cta": "Watch"
       },
       {
         "outlet": "Good Morning Britain",
@@ -315,34 +351,28 @@
         "cta": ""
       },
       {
+        "outlet": "BBC Sounds",
+        "format": "Radio · BBC Radio London",
+        "url": "https://www.bbc.co.uk/sounds/play/p0h2yhnp",
+        "cta": "Listen"
+      },
+      {
         "outlet": "RTP",
         "format": "Television · Portugal",
         "url": "https://www.rtp.pt/programa/tv/p44946/e82",
         "cta": "Watch"
       },
       {
-        "outlet": "In conversation",
-        "format": "Video",
-        "url": "https://www.youtube.com/watch?v=VGEitXb85VY",
-        "cta": "Watch"
-      },
-      {
-        "outlet": "In conversation, part two",
-        "format": "Video",
-        "url": "https://www.youtube.com/watch?v=uPeYXeCGYnw",
-        "cta": "Watch"
-      },
-      {
-        "outlet": "KPMG",
-        "format": "Invited guest",
-        "url": "",
-        "cta": ""
-      },
-      {
         "outlet": "Careers Business",
         "format": "Magazine interview",
         "url": "https://careers-business.uk/ana-vilhete-building-a-successful-business-takes-time-effort-and-resilience/",
         "cta": "Read"
+      },
+      {
+        "outlet": "All press",
+        "format": "Full list",
+        "url": "/press/",
+        "cta": "See all"
       }
     ]
   },
@@ -398,7 +428,7 @@
     "now": [
       "Leading Alium Consultancy",
       "Partner at Themis Crown Advocates",
-      "Mentoring at Birmingham University",
+      "Mentoring at University of Birmingham",
       "School governor"
     ]
   },
@@ -408,31 +438,31 @@
     "heading": "What I’ve *learned.*",
     "items": [
       {
-        "kind": "Interview",
-        "source": "Careers Business",
-        "title": "“Building a successful business takes time, effort and resilience”",
-        "text": "",
-        "url": "https://careers-business.uk/ana-vilhete-building-a-successful-business-takes-time-effort-and-resilience/",
         "featured": true,
-        "placeholder": false
+        "kind": "Note",
+        "placeholder": false,
+        "source": "anavilhete.com",
+        "text": "How I use AI in a law firm and a recruitment business, and where I draw the line.",
+        "title": "Should lawyers rely on AI?",
+        "url": "/notes/should-lawyers-rely-on-ai/"
       },
       {
-        "kind": "",
-        "source": "",
-        "title": "[ARTICLE TITLE]",
-        "text": "Space for Ana’s first essay: a lesson from building Alium.",
-        "url": "",
         "featured": false,
-        "placeholder": true
+        "kind": "Note",
+        "placeholder": false,
+        "source": "anavilhete.com",
+        "text": "Highly functional exhaustion, and the small habits that help.",
+        "title": "Why do I still feel stuck when everything looks successful?",
+        "url": "/notes/successful-but-stuck/"
       },
       {
-        "kind": "",
-        "source": "",
-        "title": "[ARTICLE TITLE]",
-        "text": "Space for a short note on law, recruitment or leadership.",
-        "url": "",
         "featured": false,
-        "placeholder": true
+        "kind": "Note",
+        "placeholder": false,
+        "source": "anavilhete.com",
+        "text": "Diverse shortlists, written criteria and international talent.",
+        "title": "How can employers hire more diverse tech and healthcare talent?",
+        "url": "/notes/hiring-diverse-tech-and-healthcare-talent/"
       }
     ]
   },
@@ -447,7 +477,7 @@
         "detail": "An orphanage in São Tomé and Príncipe caring for abandoned children"
       },
       {
-        "name": "Birmingham University",
+        "name": "University of Birmingham",
         "detail": "Mentor, offering guidance and support to students"
       },
       {
