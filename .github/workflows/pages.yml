@@ -1,0 +1,61 @@
+# Deploys anavilhete.com to GitHub Pages.
+# Builds a copy of the repo, prerenders the home page so its text is in the HTML for
+# crawlers that don't run JavaScript, and publishes that copy. The source index.html is not
+# changed, so the /admin/ editor keeps working as before (each editor publish triggers this).
+#
+# Requires: repo Settings -> Pages -> Build and deployment -> Source = "GitHub Actions".
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Assemble site folder (public files only)
+        run: |
+          mkdir _site
+          # Everything tracked in git except build tooling and repo metadata.
+          git ls-files -z | grep -zv -e '^\.github/' -e '^\.gitignore$' | xargs -0 cp --parents -t _site
+          # Private working files must never be published.
+          for p in CLAUDE.md handoff .claude; do test ! -e "_site/$p" || { echo "::error::$p would be published"; exit 1; }; done
+
+      - name: Prerender home page
+        run: |
+          npm install --prefix .github/scripts --no-save --no-audit --no-fund jsdom@24.1.3
+          node .github/scripts/prerender.mjs _site
+          grep -q "Trained in law" _site/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
