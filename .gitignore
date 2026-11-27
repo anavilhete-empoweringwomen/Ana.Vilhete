@@ -2,3 +2,7 @@
 CLAUDE.md
 handoff/
 .claude/
+
+# Build tooling installed in CI
+.github/scripts/node_modules/
+.github/scripts/package-lock.json
